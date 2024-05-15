@@ -1,0 +1,15 @@
+{
+  "name": "stock-price-checker",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "prestart": "tsc",
+    "start": "node ./dist/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
