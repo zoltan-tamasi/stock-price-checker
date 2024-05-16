@@ -9,30 +9,42 @@ const valueCountForMovingAverage = 10;
 
 const sum = (a: number, b: number) => a + b;
 
+const addNewPriceValue = (symbol: string, value: number) => {
+  let pricesForSymbol = prices.get(symbol);
+
+  if (pricesForSymbol === undefined) {
+    pricesForSymbol = [];
+  }
+
+  pricesForSymbol.unshift(value);
+
+  if (pricesForSymbol.length > valueCountForMovingAverage) {
+    pricesForSymbol = pricesForSymbol.splice(valueCountForMovingAverage);
+  }
+
+  prices.set(symbol, pricesForSymbol);
+  console.log(`[scheduler] Prices for symbol ${symbol}: ${pricesForSymbol}`);
+};
+
+const calculateMovingAverage = (symbol: string) => {
+  let pricesForSymbol = prices.get(symbol);
+
+  if (pricesForSymbol === undefined) {
+    pricesForSymbol = [];
+  }
+
+  movingAverageValues.set(symbol, pricesForSymbol.reduce(sum) / pricesForSymbol.length);
+  console.log(`[scheduler] Moving average for symbol ${symbol}: ${pricesForSymbol}`);
+};
+
 const runChecks = () => {
   console.log("[scheduler] Running scheduled checks for prices");
   Array.from(prices.keys()).forEach(symbol => {
     finnhubClient?.getQuote(symbol).then(response => {
       console.log(`[scheduler] Scheduled check for symbol: ${symbol}, current price: ${response.currentPrice}`);
       
-      let pricesForSymbol = prices.get(symbol);
-
-      if (pricesForSymbol === undefined) {
-        pricesForSymbol = [];
-      }
-
-      pricesForSymbol.unshift(response.currentPrice);
-
-      if (pricesForSymbol.length > valueCountForMovingAverage) {
-        pricesForSymbol = pricesForSymbol.splice(valueCountForMovingAverage);
-      }
-
-      prices.set(symbol, pricesForSymbol);
-      movingAverageValues.set(symbol, pricesForSymbol.reduce(sum) / pricesForSymbol.length);
-
-      console.log(`[scheduler] Prices for symbol ${symbol}: ${pricesForSymbol}`);
-      console.log(`[scheduler] Moving average for symbol ${symbol}: ${pricesForSymbol}`);
-
+      addNewPriceValue(symbol, response.currentPrice);
+      calculateMovingAverage(symbol);
     });
   })
 };
