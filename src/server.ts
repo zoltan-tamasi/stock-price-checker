@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { addSymbol, startScheduler } from "./service/scheduler";
+import { addSymbol, getMovingAverage, hasSymbol, startScheduler } from "./service/scheduler";
 import { getFinnHubService } from "./service/finnhub";
 
 dotenv.config();
@@ -13,12 +13,22 @@ const finnhubService = getFinnHubService(process.env.FINNHUB_APIKEY || "");
 app.route("/stock/:symbol")
 
   .get((req: Request, res: Response) => {
-    finnhubService.getQuote(req.params.symbol)
-      .then(response => {
+    if (!hasSymbol(req.params.symbol)) {
+      res.status(404).send({
+        error: `symbol: ${req.params.symbol} hasn't been registered yet`
+      });
+    } else {
+      const avgValue = getMovingAverage(req.params.symbol);
+      if (avgValue === undefined) {
+        res.status(404).send({
+          error: `average for symbol: ${req.params.symbol} hasn't been calculated yet`
+        });
+      } else {
         res.send({
-          currentPrice: response.currentPrice
-        })
-      })
+          average: avgValue
+        });
+      }
+    }
   })
 
   .put((req: Request, res: Response) => {
