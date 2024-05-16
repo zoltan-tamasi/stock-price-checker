@@ -15,6 +15,8 @@ describe("Stock service test", () => {
     stockService.addNewPriceValue("a", 1);
     stockService.addNewPriceValue("a", 2);
     stockService.addNewPriceValue("a", 3);
+    expect(stockService.calculateMovingAverage("a")).toEqual(2);
+
     stockService.addNewPriceValue("a", 4);
     stockService.addNewPriceValue("a", 5);
     stockService.addNewPriceValue("a", 6);
@@ -25,7 +27,7 @@ describe("Stock service test", () => {
     expect(stockService.calculateMovingAverage("a")).toEqual(5.5);
 
     stockService.addNewPriceValue("a", 11);
-    expect(stockService.calculateMovingAverage("a")).toEqual(5.5);
+    expect(stockService.calculateMovingAverage("a")).toEqual(6.5);
   });
 });
 

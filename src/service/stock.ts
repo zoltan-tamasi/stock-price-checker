@@ -31,7 +31,7 @@ export const getStockService = (finnhub: FinnhubClient, priceValues ?: Map<strin
     pricesForSymbol.unshift(value);
   
     if (pricesForSymbol.length > valueCountForMovingAverage) {
-      pricesForSymbol = pricesForSymbol.splice(valueCountForMovingAverage);
+      pricesForSymbol.splice(valueCountForMovingAverage);
     }
   
     prices.set(symbol, pricesForSymbol);
