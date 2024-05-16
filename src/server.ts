@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { addSymbol, getMovingAverage, hasSymbol, startScheduler } from "./service/scheduler";
+import { addSymbol, getMovingAverage, hasSymbol, startScheduler } from "./service/stock";
 import { getFinnHubService } from "./service/finnhub";
 
 dotenv.config();
