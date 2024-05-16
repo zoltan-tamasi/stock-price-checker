@@ -37,10 +37,20 @@ const runChecks = () => {
   })
 };
 
-export const addSymbol = (symbol: string) => {
-  console.log(`[scheduler] Added symbol: ${symbol}`);
-  prices.set(symbol, []);
-};
+export const addSymbol = (symbol: string): Promise<void> => {
+  if (finnhubClient === null) {
+    return Promise.reject(new Error("Finnhub client hasn't been initialized"));
+  }
+  
+  return finnhubClient.getQuote(symbol)
+    .then(response => {
+      response.currentPrice
+      console.log(`[scheduler] Added symbol: ${symbol} with current price: ${response.currentPrice}`);
+      prices.set(symbol, [response.currentPrice]);
+      movingAverageValues.set(symbol, response.currentPrice);
+    });
+}
+
 
 export const hasSymbol = (symbol: string) => 
   prices.has(symbol);

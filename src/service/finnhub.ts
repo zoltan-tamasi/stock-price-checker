@@ -18,9 +18,13 @@ export const getFinnHubService = (finnhubApiKey: string): FinnhubClient => {
     getQuote: (symbol: string) => {
       return new Promise((resolve, reject) => {
         finnhubClient.quote(symbol, (error: any, data: any, response: any) => {
-          resolve({
-            currentPrice: data.c
-          });
+          if (error) {
+            reject(error);
+          } else {
+            resolve({
+              currentPrice: data.c
+            });
+          }
         });
       });
     }

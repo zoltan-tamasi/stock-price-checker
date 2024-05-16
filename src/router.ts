@@ -21,12 +21,18 @@ router
         });
       }
     }
-    res;
   })
 
-  .put("/:symbol", (req: Request, res) => {
-    addSymbol(req.params.symbol);
-    res.sendStatus(200);
-  });
+  .put("/:symbol", (req: Request, res) => 
+    addSymbol(req.params.symbol)
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch(error => {
+        console.error(error instanceof Error ? error.message : JSON.stringify(error));
+        res.status(500).send({
+          error: "Unknown error happened"
+        })
+      }))
 
 export default router;
