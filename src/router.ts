@@ -16,16 +16,14 @@ router
   .get("/:symbol", (req: Request<GetRequestParams>, res) => {
     if (!stockService.hasSymbol(req.params.symbol)) {
       throw new SymbolNotRegisteredError(req.params.symbol)
-    } else {
-      const avgValue = stockService.getMovingAverage(req.params.symbol);
-      if (avgValue === undefined) {
-        throw new AverageNotCalculatedError(req.params.symbol);
-      } else {
-        res.send({
-          average: avgValue
-        });
-      }
-    }
+    } 
+    const avgValue = stockService.getMovingAverage(req.params.symbol);
+    if (avgValue === undefined) {
+      throw new AverageNotCalculatedError(req.params.symbol);
+    } 
+    res.send({
+      average: avgValue
+    });
   })
 
   .put("/:symbol", (req: Request, res, next: NextFunction) => 
