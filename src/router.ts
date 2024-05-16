@@ -1,15 +1,19 @@
 import express, { NextFunction, Request } from "express";
-import { hasSymbol, getMovingAverage, addSymbol } from "./service/stock";
-import { AverageNotCalculatedError, FinnhubNotInitializedError, SymbolNotRegisteredError } from "./service/errors";
+import { getStockService } from "./service/stock";
+import { AverageNotCalculatedError, SymbolNotRegisteredError } from "./service/errors";
+import { getFinnHubService } from "./service/finnhub";
+
+const finnhubService = getFinnHubService(process.env.FINNHUB_APIKEY || "");
+const stockService = getStockService(finnhubService);
 
 const router = express.Router();
 
 router
   .get("/:symbol", (req: Request<{ symbol: string }>, res) => {
-    if (!hasSymbol(req.params.symbol)) {
+    if (!stockService.hasSymbol(req.params.symbol)) {
       throw new SymbolNotRegisteredError(req.params.symbol)
     } else {
-      const avgValue = getMovingAverage(req.params.symbol);
+      const avgValue = stockService.getMovingAverage(req.params.symbol);
       if (avgValue === undefined) {
         throw new AverageNotCalculatedError(req.params.symbol);
       } else {
@@ -21,7 +25,7 @@ router
   })
 
   .put("/:symbol", (req: Request, res, next: NextFunction) => 
-    addSymbol(req.params.symbol)
+    stockService.addSymbol(req.params.symbol)
       .then(() => {
         res.sendStatus(200);
       })
