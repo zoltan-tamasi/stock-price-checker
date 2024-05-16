@@ -1,6 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import { startScheduler } from "./service/stock";
+import { getStockService } from "./service/stock";
 import { getFinnHubService } from "./service/finnhub";
 import router from "./router";
 import { CustomError } from "./service/errors";
@@ -25,4 +25,4 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction): void =>
   next();
 })
 
-startScheduler(finnhubService);
+getStockService(finnhubService);

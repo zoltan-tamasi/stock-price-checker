@@ -72,7 +72,7 @@ export const getMovingAverage = (symbol: string): number | undefined => {
   return movingAverageValues.get(symbol);
 };
 
-export const startScheduler = (finnhub: FinnhubClient) => {
+export const getStockService = (finnhub: FinnhubClient) => {
   finnhubClient = finnhub;
 
   cron.schedule('* * * * *', () => {
