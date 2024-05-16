@@ -1,20 +1,17 @@
-import express, { Request } from "express";
+import express, { NextFunction, Request } from "express";
 import { hasSymbol, getMovingAverage, addSymbol } from "./service/stock";
+import { AverageNotCalculatedError, FinnhubNotInitializedError, SymbolNotRegisteredError } from "./service/errors";
 
 const router = express.Router();
 
 router
   .get("/:symbol", (req: Request<{ symbol: string }>, res) => {
     if (!hasSymbol(req.params.symbol)) {
-      res.status(404).send({
-        error: `symbol: ${req.params.symbol} hasn't been registered yet`
-      });
+      throw new SymbolNotRegisteredError(req.params.symbol)
     } else {
       const avgValue = getMovingAverage(req.params.symbol);
       if (avgValue === undefined) {
-        res.status(404).send({
-          error: `average for symbol: ${req.params.symbol} hasn't been calculated yet`
-        });
+        throw new AverageNotCalculatedError(req.params.symbol);
       } else {
         res.send({
           average: avgValue
@@ -23,16 +20,11 @@ router
     }
   })
 
-  .put("/:symbol", (req: Request, res) => 
+  .put("/:symbol", (req: Request, res, next: NextFunction) => 
     addSymbol(req.params.symbol)
       .then(() => {
         res.sendStatus(200);
       })
-      .catch(error => {
-        console.error(error instanceof Error ? error.message : JSON.stringify(error));
-        res.status(500).send({
-          error: "Unknown error happened"
-        })
-      }))
+      .catch(next));
 
 export default router;

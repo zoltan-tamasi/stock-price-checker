@@ -1,3 +1,5 @@
+import { SymbolDoesntExistError } from "./errors";
+
 const finnhub = require('finnhub');
 
 export type QuoteResponse = {
@@ -18,8 +20,8 @@ export const getFinnHubService = (finnhubApiKey: string): FinnhubClient => {
     getQuote: (symbol: string) => {
       return new Promise((resolve, reject) => {
         finnhubClient.quote(symbol, (error: any, data: any, response: any) => {
-          if (error) {
-            reject(error);
+          if (data.c === 0 || data.d === null) {
+            reject(new SymbolDoesntExistError(symbol));
           } else {
             resolve({
               currentPrice: data.c

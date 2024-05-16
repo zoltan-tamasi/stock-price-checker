@@ -1,5 +1,6 @@
 import cron from "node-cron";
 import { FinnhubClient } from "./finnhub";
+import { FinnhubNotInitializedError } from "./errors";
 
 let finnhubClient: FinnhubClient | null;
 
@@ -51,9 +52,8 @@ const runChecks = () => {
 
 export const addSymbol = (symbol: string): Promise<void> => {
   if (finnhubClient === null) {
-    return Promise.reject(new Error("Finnhub client hasn't been initialized"));
+    return Promise.reject(new FinnhubNotInitializedError());
   }
-  
   return finnhubClient.getQuote(symbol)
     .then(response => {
       response.currentPrice
