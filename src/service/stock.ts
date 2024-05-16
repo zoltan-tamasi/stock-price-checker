@@ -4,18 +4,14 @@ import { FinnhubNotInitializedError } from "./errors";
 
 const sum = (a: number, b: number) => a + b;
 
-export const getStockService = (finnhub: FinnhubClient, priceValues ?: Map<string, number[]>) => {
+export const getStockService = (finnhub: FinnhubClient) => {
   let finnhubClient: FinnhubClient | null;
 
-  let prices = new Map<string, number[]>();
+  const prices = new Map<string, number[]>();
   const movingAverageValues = new Map<string, number>();
   const valueCountForMovingAverage = 10;
 
   finnhubClient = finnhub;
-
-  if (priceValues != undefined) {
-    prices = priceValues;
-  }
 
   cron.schedule('* * * * *', () => {
     runChecks();
@@ -75,7 +71,6 @@ export const getStockService = (finnhub: FinnhubClient, priceValues ?: Map<strin
       });
   }
   
-  
   const hasSymbol = (symbol: string) => 
     prices.has(symbol);
   
@@ -83,6 +78,7 @@ export const getStockService = (finnhub: FinnhubClient, priceValues ?: Map<strin
     console.log(`[scheduler] Getting moving average for symbol: ${symbol}`);
     return movingAverageValues.get(symbol);
   };
+
   const stopService = () => {
     cron.getTasks().forEach(task => {
       task.stop();
