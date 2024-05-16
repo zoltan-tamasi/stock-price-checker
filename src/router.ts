@@ -8,12 +8,12 @@ const stockService = getStockService(finnhubService);
 
 const router = express.Router();
 
-type GetRequestParams = { 
+type RequestParams = { 
   symbol: string 
 };
 
 router
-  .get("/:symbol", (req: Request<GetRequestParams>, res) => {
+  .get("/:symbol", (req: Request<RequestParams>, res) => {
     if (!stockService.hasSymbol(req.params.symbol)) {
       throw new SymbolNotRegisteredError(req.params.symbol)
     } 
@@ -26,7 +26,7 @@ router
     });
   })
 
-  .put("/:symbol", (req: Request, res, next: NextFunction) => 
+  .put("/:symbol", (req: Request<RequestParams>, res, next: NextFunction) => 
     stockService.addSymbol(req.params.symbol)
       .then(() => {
         res.sendStatus(200);
