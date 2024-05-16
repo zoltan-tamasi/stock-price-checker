@@ -1,28 +1,28 @@
 import cron from "node-cron";
-
-const finnhub = require('finnhub');
-
-const api_key = finnhub.ApiClient.instance.authentications['api_key'];
-api_key.apiKey = process.env.FINNHUB_APIKEY;
-const finnhubClient = new finnhub.DefaultApi();
+import { FinnhubClient } from "./finnhub";
 
 const prices = new Map<string, number>();
+
+let finnhubClient: FinnhubClient | null;
 
 const runChecks = () => {
   console.log("[scheduler] Running scheduled checks for prices");
   Array.from(prices.keys()).forEach(symbol => {
-    finnhubClient.quote(symbol, (error: any, data: any, response: any) => {
-      console.log(`[scheduler] Scheduled check for symbol: ${symbol}, current price: ${data.c}`);
-      prices.set(symbol, data.c);
+    finnhubClient?.getQuote(symbol).then(response => {
+      console.log(`[scheduler] Scheduled check for symbol: ${symbol}, current price: ${response.currentPrice}`);
+      prices.set(symbol, response.currentPrice);
     });
   })
 };
 
 export const addSymbol = (symbol: string) => {
+  console.log(`[scheduler] Added symbol: ${symbol}`);
   prices.set(symbol, 0);
 };
 
-export const startScheduler = () => {
+export const startScheduler = (finnhub: FinnhubClient) => {
+  finnhubClient = finnhub;
+
   cron.schedule('* * * * *', () => {
     runChecks();
   });

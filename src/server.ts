@@ -1,23 +1,24 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { addSymbol, startScheduler } from "./service/scheduler";
-const finnhub = require('finnhub');
+import { getFinnHubService } from "./service/finnhub";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-const api_key = finnhub.ApiClient.instance.authentications['api_key'];
-api_key.apiKey = process.env.FINNHUB_APIKEY;
-const finnhubClient = new finnhub.DefaultApi();
+const finnhubService = getFinnHubService(process.env.FINNHUB_APIKEY || "");
 
 app.route("/stock/:symbol")
 
   .get((req: Request, res: Response) => {
-    finnhubClient.quote(req.params.symbol, (error: any, data: any, response: any) => {
-      res.send(data);
-    });
+    finnhubService.getQuote(req.params.symbol)
+      .then(response => {
+        res.send({
+          currentPrice: response.currentPrice
+        })
+      })
   })
 
   .put((req: Request, res: Response) => {
@@ -29,4 +30,4 @@ app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
-startScheduler();
+startScheduler(finnhubService);
