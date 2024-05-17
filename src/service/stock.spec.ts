@@ -11,7 +11,7 @@ const mockFinnhub = {
 const stockService = getStockService(mockFinnhub);
 
 describe("Stock service test", () => {
-  test("add new origin", async () => {
+  test("test average calculation", async () => {
     stockService.addNewPriceValue("a", 1);
     stockService.addNewPriceValue("a", 2);
     stockService.addNewPriceValue("a", 3);
